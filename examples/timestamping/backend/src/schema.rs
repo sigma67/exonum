@@ -99,11 +99,6 @@ where
         let timestamp = timestamp_entry.timestamp.clone();
         let content_hash = &timestamp.content_hash;
 
-        // Check that timestamp with given content_hash does not exist.
-        if self.timestamps().contains(content_hash) {
-            return;
-        }
-
         // Add timestamp
         self.timestamps().put(content_hash, timestamp_entry);
     }
