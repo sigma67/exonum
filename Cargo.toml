@@ -4,6 +4,7 @@ members = [
     "examples/cryptocurrency",
     "examples/cryptocurrency-advanced/backend",
     "examples/timestamping/backend",
+    "examples/timestamping/benchmark",
     "services/configuration",
     "services/time",
     "testkit",
