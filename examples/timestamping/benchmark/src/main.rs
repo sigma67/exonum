@@ -1,4 +1,4 @@
-// Copyright 2019 The Exonum Team
+// Copyright 2019 Benedikt Putz
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#![warn(unused_extern_crates)]
 
 #[macro_use]
 extern crate serde_derive;
@@ -19,9 +18,12 @@ extern crate serde_derive;
 extern crate exonum_derive;
 
 use exonum::{
-    crypto::{gen_keypair, Hash},
+    crypto::{gen_keypair, hash, PublicKey, SecretKey},
     messages::{to_hex_string},
 };
+use std::env;
+use rand::Rng;
+use std::time::{SystemTime};
 
 mod proto;
 mod schema;
@@ -32,19 +34,39 @@ use transactions::{ TxTimestamp };
 use schema::Timestamp;
 
 fn main() {
-    // Create testkit for network with four validators.
+    let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        println!("Insufficient arguments. Please specify number of tx to send.");
+        return;
+    }
     // Create few transactions.
+    let count = args[1].parse::<usize>().unwrap();
+    let mut txs : Vec<String> = vec![String::new(); count];
+    let mut rng = rand::thread_rng();
     let keypair = gen_keypair();
-    let content = Timestamp::new(&Hash::zero(), "metadata");
-    let tx = TxTimestamp::sign(&keypair.0, content, &keypair.1);
+
+    // Main loop and post.
+    for i in 1..count {
+        let x: u64 = rng.gen();
+        if i == 1 {println!("{}", &x.to_string())}
+        let tx = self::create_transaction(&keypair.0, &keypair.1, x.to_string());
+        //api::post(&tx);
+        txs[i] = tx;
+    }
+
+    let start = SystemTime::now();
+
+    api::post_async(txs);
+
+    let end= SystemTime::now();
+    println!("Sent {} transactions in {}ms",
+             count.to_string(),
+             end.duration_since(start).expect("").as_millis().to_string());
+}
+
+fn create_transaction(public: &PublicKey, secret: &SecretKey, payload: String) -> String {
+    let content = Timestamp::new(&hash(payload.as_bytes()), "metadata");
+    let tx = TxTimestamp::sign(&public, content, &secret);
     let data = to_hex_string(&tx);
-    let url = String::from("localhost");
-    api::post(&url, &data);
-
-//    let tx_info: TransactionResponse = api
-//        .public(ApiKind::Explorer)
-//        .query(&json!({ "tx_body": data }))
-//        .post("v1/transactions")
-//        .unwrap();
-
+    data
 }

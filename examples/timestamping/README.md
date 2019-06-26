@@ -70,10 +70,10 @@ Generate templates of nodes configurations:
 <!-- markdownlint-disable MD013 -->
 
 ```sh
-exonum-timestamping generate-config example/common.toml  example/node1 --peer-address 127.0.0.1:6331
-exonum-timestamping generate-config example/common.toml  example/node2 --peer-address 127.0.0.1:6332
-exonum-timestamping generate-config example/common.toml  example/node3 --peer-address 127.0.0.1:6333
-exonum-timestamping generate-config example/common.toml  example/node4 --peer-address 127.0.0.1:6334
+exonum-timestamping generate-config example/common.toml  example/node1 --peer-address 127.0.0.1:6331 --consensus-key-pass pass:a --service-key-pass pass:a
+exonum-timestamping generate-config example/common.toml  example/node2 --peer-address 127.0.0.1:6332 --consensus-key-pass pass:a --service-key-pass pass:a
+exonum-timestamping generate-config example/common.toml  example/node3 --peer-address 127.0.0.1:6333 --consensus-key-pass pass:a --service-key-pass pass:a
+exonum-timestamping generate-config example/common.toml  example/node4 --peer-address 127.0.0.1:6334 --consensus-key-pass pass:a --service-key-pass pass:a
 ```
 
 Note that in case of copying files with consensus and service keys to the other machines, you must change the access permissions of these files for every machine.
@@ -88,24 +88,18 @@ Finalize generation of nodes configurations:
 
 ```sh
 exonum-timestamping finalize --public-api-address 0.0.0.0:8200 --private-api-address 0.0.0.0:8091 example/node1/sec.toml example/node1/cfg.toml --public-configs example/node1/pub.toml example/node2/pub.toml example/node3/pub.toml example/node4/pub.toml
-
 exonum-timestamping finalize --public-api-address 0.0.0.0:8201 --private-api-address 0.0.0.0:8092 example/node2/sec.toml example/node2/cfg.toml --public-configs example/node1/pub.toml example/node2/pub.toml example/node3/pub.toml example/node4/pub.toml
-
 exonum-timestamping finalize --public-api-address 0.0.0.0:8202 --private-api-address 0.0.0.0:8093 example/node3/sec.toml example/node3/cfg.toml --public-configs example/node1/pub.toml example/node2/pub.toml example/node3/pub.toml example/node4/pub.toml
-
 exonum-timestamping finalize --public-api-address 0.0.0.0:8203 --private-api-address 0.0.0.0:8094 example/node4/sec.toml example/node4/cfg.toml --public-configs example/node1/pub.toml example/node2/pub.toml example/node3/pub.toml example/node4/pub.toml
 ```
 
 Run nodes:
 
 ```sh
-exonum-timestamping run --node-config example/node1/cfg.toml --db-path example/db1 --public-api-address 0.0.0.0:8200
-
-exonum-timestamping run --node-config example/node2/cfg.toml --db-path example/db2 --public-api-address 0.0.0.0:8201
-
-exonum-timestamping run --node-config example/node3/cfg.toml --db-path example/db3 --public-api-address 0.0.0.0:8202
-
-exonum-timestamping run --node-config example/node4/cfg.toml --db-path example/db4 --public-api-address 0.0.0.0:8203
+exonum-timestamping run --node-config example/node1/cfg.toml --db-path example/db1 --public-api-address 0.0.0.0:8200  --consensus-key-pass pass:a --service-key-pass pass:a
+exonum-timestamping run --node-config example/node2/cfg.toml --db-path example/db2 --public-api-address 0.0.0.0:8201  --consensus-key-pass pass:a --service-key-pass pass:a
+exonum-timestamping run --node-config example/node3/cfg.toml --db-path example/db3 --public-api-address 0.0.0.0:8202  --consensus-key-pass pass:a --service-key-pass pass:a
+exonum-timestamping run --node-config example/node4/cfg.toml --db-path example/db4 --public-api-address 0.0.0.0:8203  --consensus-key-pass pass:a --service-key-pass pass:a
 ```
 
 <!-- markdownlint-enable MD013 -->
