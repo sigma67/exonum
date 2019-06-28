@@ -24,6 +24,9 @@ use exonum::{
 use std::env;
 use rand::Rng;
 use std::time::{SystemTime};
+use std::thread;
+use std::time;
+use std::slice::Chunks;
 
 mod proto;
 mod schema;
@@ -35,18 +38,21 @@ use schema::Timestamp;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    if args.len() < 2 {
+    if args.len() < 3 {
         println!("Insufficient arguments. Please specify number of tx to send.");
         return;
     }
-    // Create few transactions.
+    //benchmark parameters
     let count = args[1].parse::<usize>().unwrap();
-    let mut txs : Vec<String> = vec![String::new(); count];
+    let seconds = args[2].parse::<usize>().unwrap();
+    let wait = args[3].parse::<u64>().unwrap();
+
+    //create transactions
+    let mut txs : Vec<String> = vec![String::new(); count*seconds];
     let mut rng = rand::thread_rng();
     let keypair = gen_keypair();
 
-    // Main loop and post.
-    for i in 1..count {
+    for i in 1..(count*seconds) {
         let x: u64 = rng.gen();
         if i == 1 {println!("{}", &x.to_string())}
         let tx = self::create_transaction(&keypair.0, &keypair.1, x.to_string());
@@ -54,13 +60,28 @@ fn main() {
         txs[i] = tx;
     }
 
-    let start = SystemTime::now();
+    //create chunks
+    let posts = txs.chunks(count);
+    let mut items : Vec<Vec<String>> = Vec::with_capacity(seconds);
+    for p in posts {
+        items.push(p.to_vec());
+    }
 
-    api::post_async(txs);
+    //post transactions
+    let start = SystemTime::now();
+    for p in items {
+        let pre = SystemTime::now();
+        api::post_async(p);
+        let passed = SystemTime::now().duration_since(pre).unwrap();
+        println!("{} for posting", passed.as_millis());
+        if passed.as_millis() < u128::from(wait) {
+            thread::sleep(time::Duration::from_millis(wait) - passed);
+        }
+    }
 
     let end= SystemTime::now();
     println!("Sent {} transactions in {}ms",
-             count.to_string(),
+             (count*seconds).to_string(),
              end.duration_since(start).expect("").as_millis().to_string());
 }
 
