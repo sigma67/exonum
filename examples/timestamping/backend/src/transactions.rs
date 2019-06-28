@@ -82,7 +82,7 @@ impl Transaction for TxTimestamp {
         let hash = &self.content.content_hash;
 
         let schema = Schema::new(context.fork());
-        if let Some(_entry) = schema.timestamps().get(hash) {
+        if schema.timestamps().contains(hash) {
             Err(Error::HashAlreadyExists)?;
         }
 
